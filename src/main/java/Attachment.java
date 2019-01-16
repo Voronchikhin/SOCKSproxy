@@ -49,7 +49,7 @@ public abstract class Attachment {
     void close() {
         try {
             socketChannel.close();
-            socketChannel.keyFor(selector).cancel();
+            //socketChannel.keyFor(selector).cancel();
         } catch (IOException e) {
             e.printStackTrace();
         }

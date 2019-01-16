@@ -115,7 +115,6 @@ public class ForwarderHandler implements Handler {
     public void onAccept(SelectableChannel channel) {
         logger.debug("accept");
         throw new RuntimeException();
-
     }
 
     @Override

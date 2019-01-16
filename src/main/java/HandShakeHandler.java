@@ -28,7 +28,7 @@ public class HandShakeHandler implements Handler {
 
             SelectionKey selectionKey = channel.keyFor(selector);
             selectionKey.interestOps(selectionKey.interestOps()&~SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -37,12 +37,11 @@ public class HandShakeHandler implements Handler {
     public void onWrite(SelectableChannel channel) {
         logger.trace("write hs handler");
         buffer.clear();
-        buffer.put(ProtocolType.fifth);
+        buffer.put(ProtocolType.SOCKS5);
         buffer.put((byte) 0x00);
         buffer.flip();
         try {
             client.write(buffer);
-            //channel.register(selector, SelectionKey.OP_READ);
         } catch (IOException e) {
             e.printStackTrace();
         }

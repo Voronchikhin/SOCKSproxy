@@ -1,3 +1,3 @@
 public class ProtocolType {
-    final static public byte fifth = 5;
+    final static public byte SOCKS5 = 5;
 }

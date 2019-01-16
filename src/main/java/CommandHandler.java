@@ -20,7 +20,6 @@ public class CommandHandler implements Handler {
     private Logger logger = LogManager.getLogger(CommandHandler.class);
     private int readed = 0;
     private InetAddress inet4Address;
-
     public CommandHandler(Selector selector, SocketChannel client) {
         this.client = client;
         this.selector = selector;
@@ -38,6 +37,7 @@ public class CommandHandler implements Handler {
             switch (atype) {
                 case AddressType.DOMAIN:
                     logger.debug("domain addressing");
+                    connectDomain();
                     break;
                 case AddressType.IP4:
                     logger.debug("ipv4 addressing");
@@ -49,7 +49,24 @@ public class CommandHandler implements Handler {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            client.keyFor(selector).cancel();
+            try {
+                client.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
+    }
+
+    private void connectDomain() throws IOException {
+        logger.info("start dns connection");
+        byte hostLength = buffer.get();
+        byte[] address = new byte[(int) hostLength & 0xFF];
+        buffer.get(address);
+        String hostname = new String(address);
+        short port = buffer.getShort();
+
+        client.register(selector,0,new DomainHandler(client, hostname, port, selector));
     }
 
     private void connectIPv4(SocketChannel client, Selector selector) throws IOException {
@@ -62,7 +79,7 @@ public class CommandHandler implements Handler {
         host = SocketChannel.open();
         host.configureBlocking(false);
         host.connect(new InetSocketAddress(inet4Address, port));
-        
+
         client.register(selector, 0, this);
         host.register(selector, SelectionKey.OP_CONNECT,this);
     }
